@@ -55,7 +55,7 @@
 		"setimmediate": ">= 1.0.1",
 		"startpoint": "x",
 		"stream-buffers": "x",
-		"underscore": "~1.4.4",
+		"underscore": "~1.13.6",
 		"xmlbuilder": "^2.4.5"
 	},
 	"devDependencies": {
