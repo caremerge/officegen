@@ -62,7 +62,7 @@
     "lodash": "^4.17.21",
     "readable-stream": "~3.6.0",
     "setimmediate": "~1.0.5",
-    "xmlbuilder": "^15.1.1"
+    "xmlbuilder": "2.4.5"
   },
   "devDependencies": {
     "@babel/core": "^7.13.8",
