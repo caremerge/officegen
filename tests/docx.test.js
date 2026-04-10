@@ -256,7 +256,7 @@ describe('DOCX generator', function () {
     docx.on('error', onError)
 
     var pObj = docx.createP()
-    pObj.addText('Cancelled event', { strike: true })
+    pObj.addText('Cancelled event', { strikethrough: true })
 
     docx.createTable(
       [
@@ -269,7 +269,7 @@ describe('DOCX generator', function () {
                   {
                     type: 'text',
                     val: 'Cancelled in table',
-                    opts: { strike: true }
+                    opts: { strikethrough: true }
                   }
                 ]
               }

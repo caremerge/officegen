@@ -97,12 +97,12 @@ describe('XLSX generator', function () {
     sheet.data[0] = []
     sheet.data[0][0] = {
       value: 'Cancelled',
-      options: { strike: true }
+      options: { strikethrough: true }
     }
     sheet.data[1] = []
     sheet.data[1][0] = {
       value: 'Wrapped\nCancelled',
-      options: { strike: true }
+      options: { strikethrough: true }
     }
 
     var outFilename = 'test-xls-strike.xlsx'
