@@ -28,6 +28,7 @@ var assert = require('assert')
 var officegen = require('../')
 var fs = require('fs')
 var path = require('path')
+var JSZip = require('jszip')
 
 var outDir = path.join(__dirname, '../tmp/')
 
@@ -83,6 +84,45 @@ describe('XLSX generator', function () {
     xlsx.generate(out)
     out.on('close', function () {
       done()
+    })
+  })
+
+  it('supports strike-through styling for cells', function (done) {
+    var xlsx = officegen('xlsx')
+    xlsx.on('error', onError)
+
+    var sheet = xlsx.makeNewSheet()
+    sheet.name = 'Strike Test'
+
+    sheet.data[0] = []
+    sheet.data[0][0] = {
+      value: 'Cancelled',
+      options: { strikethrough: true }
+    }
+    sheet.data[1] = []
+    sheet.data[1][0] = {
+      value: 'Wrapped\nCancelled',
+      options: { strikethrough: true }
+    }
+
+    var outFilename = 'test-xls-strike.xlsx'
+    var outPath = path.join(outDir, outFilename)
+    var out = fs.createWriteStream(outPath)
+    xlsx.generate(out)
+    out.on('close', async function () {
+      try {
+        var fileBuffer = fs.readFileSync(outPath)
+        var zip = await JSZip.loadAsync(fileBuffer)
+        var stylesXml = await zip.file('xl/styles.xml').async('string')
+        var sheetXml = await zip.file('xl/worksheets/sheet1.xml').async('string')
+
+        assert(stylesXml.includes('<strike/>'))
+        assert(sheetXml.includes('<c r="A1" s="2" t="s">'))
+        assert(sheetXml.includes('<c r="A2" s="3" t="s">'))
+        done()
+      } catch (err) {
+        done(err)
+      }
     })
   })
 })
