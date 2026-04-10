@@ -28,6 +28,7 @@ var assert = require('assert')
 var officegen = require('../')
 var fs = require('fs')
 var path = require('path')
+var JSZip = require('jszip')
 
 var dirImages = path.join(__dirname, '../examples/')
 var outDir = path.join(__dirname, '../tmp/')
@@ -247,6 +248,57 @@ describe('DOCX generator', function () {
     docx.generate(out)
     out.on('close', function () {
       done()
+    })
+  })
+
+  it('applies strike-through to paragraph and table runs', function (done) {
+    var docx = officegen('docx')
+    docx.on('error', onError)
+
+    var pObj = docx.createP()
+    pObj.addText('Cancelled event', { strike: true })
+
+    docx.createTable(
+      [
+        [
+          {
+            val: [
+              {
+                inline: true,
+                values: [
+                  {
+                    type: 'text',
+                    val: 'Cancelled in table',
+                    opts: { strike: true }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      ],
+      { borders: true }
+    )
+
+    var outFilename = 'test-doc-strike.docx'
+    var outPath = path.join(outDir, outFilename)
+    var out = fs.createWriteStream(outPath)
+    out.on('error', onError)
+
+    docx.generate(out)
+    out.on('close', async function () {
+      try {
+        var fileBuffer = fs.readFileSync(outPath)
+        var zip = await JSZip.loadAsync(fileBuffer)
+        var documentXml = await zip.file('word/document.xml').async('string')
+
+        assert(documentXml.includes('Cancelled event'))
+        assert(documentXml.includes('Cancelled in table'))
+        assert(documentXml.includes('<w:strike/>'))
+        done()
+      } catch (err) {
+        done(err)
+      }
     })
   })
 })
